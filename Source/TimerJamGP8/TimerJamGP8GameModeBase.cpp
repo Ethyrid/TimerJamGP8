@@ -6,6 +6,6 @@
 
 AMyGameModeBase::AMyGameModeBase()
 {
-	// Configura el PlayerControllerClass para utilizar tu PlayerController personalizado
+	// PlayerControllerClass = mi PlayerController personalizado
 	PlayerControllerClass = AMyPlayerController::StaticClass();
 }
