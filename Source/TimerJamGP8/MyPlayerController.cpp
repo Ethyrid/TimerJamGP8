@@ -11,7 +11,7 @@ void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Llama al método para iniciar el temporizador
+	// Metodo para iniciar el temporizador
 	IniciarTemporizador();
 }
 
@@ -33,7 +33,7 @@ void AMyPlayerController::ActualizarTemporizador()
 	// Imprime el tiempo restante en la consola
 	UE_LOG(LogTemp, Warning, TEXT("Tiempo restante: %d"), TiempoRestante);
 
-	// Si el tiempo restante es menor o igual a 0, detén el temporizador
+	// Si el tiempo restante es menor o igual a 0, el temporizador se para
 	if (TiempoRestante <= 0)
 	{
 		// Detiene el temporizador
