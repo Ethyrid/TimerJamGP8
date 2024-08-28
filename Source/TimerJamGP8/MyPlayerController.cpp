@@ -1,45 +1,77 @@
 #include "MyPlayerController.h"
-#include "TimerManager.h"  // Maneja los temporizadores
+#include "Kismet/GameplayStatics.h"
+#include "Engine/World.h"
+#include "Blueprint/UserWidget.h"  // Asegúrate de incluir esto para trabajar con UUserWidget
 
 AMyPlayerController::AMyPlayerController()
 {
-	// Inicia el tiempo restante (10 segundos en este caso)
-	TiempoRestante = 10;
+	PrimaryActorTick.bCanEverTick = true;
+	RemainingTime = InitialTime;
+	PointsCollected = 0;
 }
 
 void AMyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Metodo para iniciar el temporizador
-	IniciarTemporizador();
-}
+	GetWorld()->GetTimerManager().SetTimer(CountdownTimerHandle, this, &AMyPlayerController::UpdateTimer, 1.0f, true);
 
-void AMyPlayerController::IniciarTemporizador()
-{
-	// Verifica que el mundo sea válido antes de intentar obtener el TimerManager
-	if (GetWorld())
+	if (TimerWidgetClass != nullptr)
 	{
-		// Configura el temporizador para que llame a ActualizarTemporizador cada segundo
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AMyPlayerController::ActualizarTemporizador, 1.0f, true);
+		TimerWidgetInstance = CreateWidget<UUserWidget>(this, TimerWidgetClass);
+		if (TimerWidgetInstance != nullptr)
+		{
+			TimerWidgetInstance->AddToViewport();
+		}
 	}
 }
 
-void AMyPlayerController::ActualizarTemporizador()
+void AMyPlayerController::Tick(float DeltaSeconds)
 {
-	// Resta 1 al tiempo restante
-	TiempoRestante--;
+	Super::Tick(DeltaSeconds);
 
-	// Imprime el tiempo restante en la consola
-	UE_LOG(LogTemp, Warning, TEXT("Tiempo restante: %d"), TiempoRestante);
-
-	// Si el tiempo restante es menor o igual a 0, el temporizador se para
-	if (TiempoRestante <= 0)
+	if (TimerWidgetInstance)
 	{
-		// Detiene el temporizador
-		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
-
-		// Imprime un mensaje indicando que el tiempo ha terminado
-		UE_LOG(LogTemp, Warning, TEXT("¡Se acabó el tiempo!"));
+		// Puedes actualizar el widget con el tiempo restante aquí si es necesario
 	}
+}
+
+void AMyPlayerController::UpdateTimer()
+{
+	if (RemainingTime > 0)
+	{
+		--RemainingTime;
+		// Actualizar el widget aquí si es necesario
+	}
+	else
+	{
+		HandleDefeat();
+	}
+}
+
+void AMyPlayerController::HandleVictory()
+{
+	UGameplayStatics::OpenLevel(this, FName("VictoryMap"));  // Cambia al mapa de victoria
+}
+
+void AMyPlayerController::HandleDefeat()
+{
+	GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
+	UGameplayStatics::OpenLevel(this, FName("GameOverMap"));  // Cambia al mapa de derrota
+}
+
+void AMyPlayerController::AddTimeBonus()
+{
+	RemainingTime += TimeBonus;
+	PointsCollected++;
+
+	if (PointsCollected >= 10)
+	{
+		HandleVictory();
+	}
+}
+
+int32 AMyPlayerController::GetRemainingTime() const
+{
+	return RemainingTime;
 }
