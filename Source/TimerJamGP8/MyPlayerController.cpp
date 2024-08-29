@@ -1,7 +1,8 @@
 #include "MyPlayerController.h"
+#include "Components/TextBlock.h"  // Incluye el TextBlock
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
-#include "Blueprint/UserWidget.h"  // Asegúrate de incluir esto para trabajar con UUserWidget
+#include "Blueprint/UserWidget.h"
 
 AMyPlayerController::AMyPlayerController()
 {
@@ -22,6 +23,12 @@ void AMyPlayerController::BeginPlay()
 		if (TimerWidgetInstance != nullptr)
 		{
 			TimerWidgetInstance->AddToViewport();
+
+			// Obtén la referencia al TextBlock dentro del widget TimerHUD
+			TimeText = Cast<UTextBlock>(TimerWidgetInstance->GetWidgetFromName(TEXT("TimeText")));
+
+			// Muestra el tiempo inicial
+			UpdateTimerDisplay();
 		}
 	}
 }
@@ -29,11 +36,7 @@ void AMyPlayerController::BeginPlay()
 void AMyPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	if (TimerWidgetInstance)
-	{
-		// Puedes actualizar el widget con el tiempo restante aquí si es necesario
-	}
+	// Aquí podrías realizar otras actualizaciones, si es necesario
 }
 
 void AMyPlayerController::UpdateTimer()
@@ -41,7 +44,7 @@ void AMyPlayerController::UpdateTimer()
 	if (RemainingTime > 0)
 	{
 		--RemainingTime;
-		// Actualizar el widget aquí si es necesario
+		UpdateTimerDisplay();  // Actualiza el tiempo en pantalla cada segundo
 	}
 	else
 	{
@@ -49,15 +52,25 @@ void AMyPlayerController::UpdateTimer()
 	}
 }
 
+void AMyPlayerController::UpdateTimerDisplay()
+{
+	if (TimeText)
+	{
+		int32 Minutes = RemainingTime / 60;
+		int32 Seconds = RemainingTime % 60;
+		TimeText->SetText(FText::FromString(FString::Printf(TEXT("%02d:%02d"), Minutes, Seconds)));
+	}
+}
+
 void AMyPlayerController::HandleVictory()
 {
-	UGameplayStatics::OpenLevel(this, FName("VictoryMap"));  // Cambia al mapa de victoria
+	UGameplayStatics::OpenLevel(this, FName("VictoryMap"));
 }
 
 void AMyPlayerController::HandleDefeat()
 {
 	GetWorld()->GetTimerManager().ClearTimer(CountdownTimerHandle);
-	UGameplayStatics::OpenLevel(this, FName("GameOverMap"));  // Cambia al mapa de derrota
+	UGameplayStatics::OpenLevel(this, FName("GameOverMap"));
 }
 
 void AMyPlayerController::AddTimeBonus()

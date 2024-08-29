@@ -14,10 +14,7 @@ public:
 	AMyPlayerController();
 
 protected:
-	// Se llama cuando el juego comienza
 	virtual void BeginPlay() override;
-
-	// Se llama en cada frame
 	virtual void Tick(float DeltaSeconds) override;
 
 	// Manejador del temporizador
@@ -31,22 +28,29 @@ protected:
 
 	// Tiempo inicial del temporizador
 	UPROPERTY(EditAnywhere, Category = "Timer")
-		int32 InitialTime = 150;  // 2 minutos y 30 segundos
+		int32 InitialTime = 150;
 
-		// Tiempo extra al pasar por un punto
+	// Tiempo extra al pasar por un punto
 	UPROPERTY(EditAnywhere, Category = "Timer")
 		int32 TimeBonus = 10;
 
-	// Referencia al Blueprint del widget
+	// Referencia al Blueprint del widget TimerHUD
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI")
 		TSubclassOf<UUserWidget> TimerWidgetClass;
 
-	// Instancia del widget
+	// Instancia del widget TimerHUD
 	UPROPERTY()
 		UUserWidget* TimerWidgetInstance;
 
+	// Referencia al TextBlock dentro del TimerHUD para mostrar el tiempo
+	UPROPERTY(meta = (BindWidget))
+		class UTextBlock* TimeText;
+
 	// Actualiza el temporizador
 	void UpdateTimer();
+
+	// Actualiza el texto del temporizador en la pantalla
+	void UpdateTimerDisplay();
 
 	// Maneja la victoria
 	void HandleVictory();
