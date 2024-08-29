@@ -2,7 +2,7 @@
 #include "Components/BoxComponent.h"
 #include "MyPlayerController.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/Character.h"  // Incluir este encabezado para ACharacter
+#include "GameFramework/Pawn.h"  // Incluir este encabezado para APawn
 
 // Constructor
 ATimeBonusPoint::ATimeBonusPoint()
@@ -39,10 +39,10 @@ void ATimeBonusPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor
 {
 	AMyPlayerController* PlayerController = Cast<AMyPlayerController>(UGameplayStatics::GetPlayerController(this, 0));
 
-	if (PlayerController && OtherActor->IsA(ACharacter::StaticClass()))
+	// Cambiado para verificar si el Actor es un Pawn en lugar de solo ACharacter
+	if (PlayerController && OtherActor->IsA(APawn::StaticClass()))
 	{
 		PlayerController->AddTimeBonus();
 		Destroy(); // Destruye el punto de bonificación después de ser usado
 	}
 }
-

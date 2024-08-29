@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 #include "MyPlayerController.generated.h"
 
 UCLASS()
@@ -44,7 +45,7 @@ protected:
 
 	// Referencia al TextBlock dentro del TimerHUD para mostrar el tiempo
 	UPROPERTY(meta = (BindWidget))
-		class UTextBlock* TimeText;
+		UTextBlock* TimeText;
 
 	// Actualiza el temporizador
 	void UpdateTimer();
@@ -60,7 +61,7 @@ protected:
 
 public:
 	// Añade un bono de tiempo
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Timer")
 		void AddTimeBonus();
 
 	// Devuelve el tiempo restante
